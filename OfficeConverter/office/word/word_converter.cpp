@@ -23,14 +23,15 @@ bool WordConverter::Convert(const std::wstring& file_path,
     WordApp.m_bAutoRelease = true;
     try
     {
-        if (CoInitialize(NULL) == 0)
+        if (CoInitialize(NULL) != S_OK)
         {
-            AfxMessageBox(L"初始化时出现错误");
+            AfxMessageBox(L"初始化COM时出现错误");
             return false;
         }
         if (!WordApp.CreateDispatch(L"Word.Application", NULL))
         {
             AfxMessageBox(L"无法启动Word程序!");
+            CoUninitialize();
             return false;
         }
     }

@@ -22,19 +22,21 @@ bool PptConverter::Convert(const std::wstring& file_path,
     CApplication ppt_app;
     CPresentations presentations;
     CPresentation presentation;
-    CSlide slide;
-    CSlides slides;
+    //CSlide slide;
+    //CSlides slides;
 
     try
     {
-        if (CoInitialize(NULL) == 0)
+        if (CoInitialize(NULL) != S_OK)
         {
-            AfxMessageBox(L"初始化时出现错误");
+            DWORD erro = GetLastError();
+            AfxMessageBox(L"初始化COM时出现错误");
             return false;
         }
         if (!ppt_app.CreateDispatch(_T("PowerPoint.Application"), NULL))
         {
             AfxMessageBox(L"无法启动PowerPoint程序!");
+            CoUninitialize();
             return false;
         }
     }
@@ -48,8 +50,12 @@ bool PptConverter::Convert(const std::wstring& file_path,
     ppt_app.put_WindowState(long(2));
     presentations.AttachDispatch(ppt_app.get_Presentations());
     presentations.Open(file_path.c_str(), TRUE, 1, 1);
-    presentation.AttachDispatch(ppt_app.get_ActivePresentation(), TRUE);
+    presentation.AttachDispatch(ppt_app.get_ActivePresentation(), TRUE);    
+    presentation.Export(output_path.c_str(), L"png", ppt_app.get_Width(), ppt_app.get_Height());
 
+    //////////////////////////////////////////////////////////////////////////
+    /* another way to convert to image files */
+    /*
     slides = presentation.get_Slides();
     int pageCount = slides.get_Count();
     for (int i = 1; i <= pageCount; i++)
@@ -57,7 +63,7 @@ bool PptConverter::Convert(const std::wstring& file_path,
         slide = slides.Range(COleVariant((long)i));
         slide.Copy();
         std::wostringstream out_stream;
-        out_stream << output_path.c_str() << L"_word_" << i << L".png";
+        out_stream << output_path.c_str() << L"_ppt_" << i << L".png";
         bool result = Save(out_stream.str());
         if (!result)
         {
@@ -75,10 +81,12 @@ bool PptConverter::Convert(const std::wstring& file_path,
     }
     slide.ReleaseDispatch();
     slides.ReleaseDispatch();
+    */
+    //////////////////////////////////////////////////////////////////////////
     presentation.Close();
+    ppt_app.Quit();
     presentation.ReleaseDispatch();
     presentations.ReleaseDispatch();
-    ppt_app.Quit();
     ppt_app.ReleaseDispatch();
     CoUninitialize();
     return true;

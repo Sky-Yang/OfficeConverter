@@ -33,15 +33,16 @@ bool ExcelConverter::Convert(const std::wstring& file_path,
         covFalse((short)FALSE),
         covOptional((long)DISP_E_PARAMNOTFOUND, VT_ERROR);
 
-    if (CoInitialize(NULL) == 0)
+    if (CoInitialize(NULL) != S_OK)
     {
-        AfxMessageBox(L"初始化时出现错误");
+        AfxMessageBox(L"初始化COM时出现错误");
         return false;
     }
 
     if (!app.CreateDispatch(_T("Excel.Application")))
     {
         AfxMessageBox(_T("无法启动Excel程序!"));
+        CoUninitialize();
         return false;
     }
 
@@ -68,7 +69,6 @@ bool ExcelConverter::Convert(const std::wstring& file_path,
         sheet.Activate();
 
         used_range.AttachDispatch(sheet.get_UsedRange());
-
         used_range.Select();
 
         used_range.CopyPicture(1, 1);

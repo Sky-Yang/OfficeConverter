@@ -155,6 +155,7 @@ void COfficeConverterDlg::OnBnClickedButton1()
     }
     bool result = converter->Convert(strFilePath.GetBuffer(),
                                      szOutDir.GetBuffer());
+    converter.reset();
     strFilePath.ReleaseBuffer();
     szOutDir.ReleaseBuffer();
     if (result)
