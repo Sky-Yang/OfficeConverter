@@ -1,5 +1,7 @@
 #include "StdAfx.h"
 #include "office/excel/excel_converter.h"
+
+#include <sstream>
 #include "office/excel/excel_interfaces.h"
 
 using namespace excel;
@@ -15,8 +17,7 @@ ExcelConverter::~ExcelConverter()
 }
 
 bool ExcelConverter::Convert(const std::wstring& file_path,
-                             const std::wstring& output_path,
-                             int width, int height)
+                             const std::wstring& output_path)
 {
     CApplication app;
     CWorkbooks books;
@@ -32,30 +33,18 @@ bool ExcelConverter::Convert(const std::wstring& file_path,
         covFalse((short)FALSE),
         covOptional((long)DISP_E_PARAMNOTFOUND, VT_ERROR);
 
-    if (CoInitialize(NULL) != S_OK)
+    if (CoInitialize(NULL) == 0)
     {
-        AfxMessageBox(L"初始化COM时出现错误");
+        AfxMessageBox(L"初始化时出现错误");
         return false;
     }
 
     if (!app.CreateDispatch(_T("Excel.Application")))
     {
-        AfxMessageBox(_T("无法启动Excel程序!请先安装Office Excel!"));
-        CoUninitialize();
+        AfxMessageBox(_T("无法启动Excel程序!"));
         return false;
     }
 
-    CString version = app.get_Version();
-    int ver = 15;
-    try
-    {
-        ver = _wtoi(version.GetBuffer());
-        version.ReleaseBuffer();
-    }
-    catch (...)
-    {
-        assert(false && L"转换版本号失败，用最新接口执行");
-    }
     app.put_UserControl(TRUE);
 
     books.AttachDispatch(app.get_Workbooks());
@@ -79,16 +68,14 @@ bool ExcelConverter::Convert(const std::wstring& file_path,
         sheet.Activate();
 
         used_range.AttachDispatch(sheet.get_UsedRange());
+
         used_range.Select();
 
         used_range.CopyPicture(1, 1);
 
-        std::wstring filename;
-        filename.resize(256);
-        bool result = false;
-        if (0 < swprintf_s(&filename.front(), 256, L"%s%s%04d%s", output_path.c_str(), L"_excel_", i, L".png"))
-            result = Save(filename, width, height);
-
+        std::wostringstream out_stream;
+        out_stream << output_path.c_str() << L"_word_" << i << L".png";
+        bool result = Save(out_stream.str());
         if (!result)
         {
             used_range.ReleaseDispatch();

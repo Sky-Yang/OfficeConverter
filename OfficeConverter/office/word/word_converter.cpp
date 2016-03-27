@@ -1,5 +1,7 @@
 #include "StdAfx.h"
 #include "office/word/word_converter.h"
+
+#include <sstream>
 #include "office/word/word_interfaces.h"
 
 using namespace word;
@@ -15,22 +17,20 @@ WordConverter::~WordConverter()
 }
 
 bool WordConverter::Convert(const std::wstring& file_path, 
-                            const std::wstring& output_path,
-                            int width, int height)
+                            const std::wstring& output_path)
 {
     CApplication WordApp;   // WORD程序
     WordApp.m_bAutoRelease = true;
     try
     {
-        if (CoInitialize(NULL) != S_OK)
+        if (CoInitialize(NULL) == 0)
         {
-            AfxMessageBox(L"初始化COM时出现错误");
+            AfxMessageBox(L"初始化时出现错误");
             return false;
         }
         if (!WordApp.CreateDispatch(L"Word.Application", NULL))
         {
-            AfxMessageBox(L"无法启动Word程序!请先安装Office Word!");
-            CoUninitialize();
+            AfxMessageBox(L"无法启动Word程序!");
             return false;
         }
     }
@@ -38,17 +38,6 @@ bool WordConverter::Convert(const std::wstring& file_path,
     {
         assert(false && L"初始化时出现错误");
         return false;
-    }
-    CString version = WordApp.get_Version();
-    int ver = 15;
-    try
-    {
-        ver = _wtoi(version.GetBuffer());
-        version.ReleaseBuffer();
-    }
-    catch (...)
-    {
-        assert(false && L"转换版本号失败，用最新接口执行");
     }
 
     COleVariant  varfilepath(file_path.c_str());
@@ -59,42 +48,13 @@ bool WordConverter::Convert(const std::wstring& file_path,
     COleVariant  var_file_format((long)DISP_E_PARAMNOTFOUND, VT_ERROR);
 
     CDocuments docs;        // WORD程序里的所有文档
-    LPDISPATCH lpDisp;
     docs.AttachDispatch(WordApp.get_Documents());
     try
     {
-        switch (ver)
-        {
-        case OFFICE_97:
-            lpDisp = docs.OpenOld(&varfilepath, &varfalse, &vartrue, &varfalse,
-                                  &covOptional, &covOptional, &varfalse,
-                                  &covOptional, &covOptional, &var_file_format);
-            break;
-        case OFFICE_2000:
-            lpDisp = docs.Open2000(&varfilepath, &varfalse, &vartrue, &varfalse,
-                                   &covOptional, &covOptional, &varfalse,
-                                   &covOptional, &covOptional, &var_file_format,
-                                   &covOptional, &vartrue);
-            break;
-        case OFFICE_2002:
-            lpDisp = docs.Open2002(&varfilepath, &varfalse, &vartrue, &varfalse,
-                                   &covOptional, &covOptional, &varfalse,
-                                   &covOptional, &covOptional, &var_file_format,
-                                   &covOptional, &vartrue, &covOptional,
-                                   &covOptional, &covOptional);
-            break;
-        case OFFICE_2003:
-        case OFFICE_2007:
-        case OFFICE_2010:
-        case OFFICE_2013:
-        default:
-            lpDisp = docs.Open(&varfilepath, &varfalse, &vartrue, &varfalse,
-                               &covOptional, &covOptional, &varfalse, 
-                               &covOptional, &covOptional, &var_file_format, 
-                               &covOptional, &vartrue, &covOptional, 
-                               &covOptional, &covOptional, &covOptional);
-        	break;
-        }
+        docs.Open(&varfilepath, &varfalse, &vartrue, &varfalse,
+                  &covOptional, &covOptional, &varfalse, &covOptional,
+                  &covOptional, &var_file_format, &covOptional, &vartrue, 
+                  &covOptional, &covOptional, &covOptional, &covOptional);
     }
     catch (...)
     {
@@ -107,7 +67,7 @@ bool WordConverter::Convert(const std::wstring& file_path,
     word::CDocument doc;    // 文档
     CSelection selection;   // 定义word提供的选择对象
     CRange rng;
-    doc.AttachDispatch(lpDisp);
+    doc.AttachDispatch(WordApp.get_ActiveDocument());
     selection.AttachDispatch(WordApp.get_Selection());
     selection.WholeStory();
     try 
@@ -126,7 +86,7 @@ bool WordConverter::Convert(const std::wstring& file_path,
     long start = 0;
     long end = 0;
 
-    long page_count = rng.ComputeStatistics(2);   //页数
+    long page_count = doc.ComputeStatistics(2, &covOptional);   //页数
     selection.SetRange(start, end);
 
     int count = page_count;
@@ -159,12 +119,9 @@ bool WordConverter::Convert(const std::wstring& file_path,
             return false;
         }
 
-        std::wstring filename;
-        filename.resize(256);
-        bool result = false;
-        if (0 < swprintf_s(&filename.front(), 256, L"%s%s%04d%s", output_path.c_str(), L"_word_", num, L".png"))
-            result = Save(filename, width, height);
-
+        std::wostringstream out_stream;
+        out_stream << output_path.c_str() << L"_word_" << num << L".png";
+        bool result = Save(out_stream.str());
         if (!result)
         {
             rng.ReleaseDispatch();

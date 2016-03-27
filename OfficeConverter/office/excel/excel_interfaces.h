@@ -1,6 +1,6 @@
 #ifndef _EXCEL_INTERFACES_H_
 #define _EXCEL_INTERFACES_H_
-// 从类型库向导中用“添加类”创建的计算机生成的 IDispatch 包装器类
+
 namespace excel
 {
 

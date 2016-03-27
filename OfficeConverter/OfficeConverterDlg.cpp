@@ -136,8 +136,6 @@ void COfficeConverterDlg::OnBnClickedButton1()
                     strFilePath.Left(strFilePath.Find(L".")));
 
     std::shared_ptr<OfficeConverter> converter;
-    int width = 1920;
-    int height = 1080;
     if (szFileExt == L"doc" || szFileExt == L"docx")
     {
         converter.reset(new WordConverter());
@@ -156,8 +154,7 @@ void COfficeConverterDlg::OnBnClickedButton1()
         return;
     }
     bool result = converter->Convert(strFilePath.GetBuffer(),
-                                     szOutDir.GetBuffer(), width, height);
-    converter.reset();
+                                     szOutDir.GetBuffer());
     strFilePath.ReleaseBuffer();
     szOutDir.ReleaseBuffer();
     if (result)

@@ -35,39 +35,6 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
 #include <afxcontrolbars.h>     // 功能区和控件条的 MFC 支持
 
-//#pragma region Import the type libraries
-//
-//#import ".\\lib\\MSO.DLL" \
-//	rename("RGB", "MSORGB") \
-//	rename("DocumentProperties", "MSODocumentProperties")
-//
-//
-////#import "libid:0002E157-0000-0000-C000-000000000046"
-//// [-or-]
-//#import ".\\lib\\VBE6EXT.OLB"
-//
-//using namespace VBIDE;
-//
-//#import ".\\lib\\MSWORD.OLB" \
-//    rename("FindText",  "FindTextEx") \
-//    rename("ExitWindows", "WordExitWindows") \
-//    rename_namespace("word"), named_guids, raw_interfaces_only
-//
-//#import ".\\lib\\MSPPT.OLB" \
-//	rename("DialogBox", "ExcelDialogBox") \
-//	rename("RGB", "ExcelRGB") \
-//	rename("CopyFile", "ExcelCopyFile") \
-//	rename("ReplaceText", "ExcelReplaceText") \
-//	no_auto_exclude
-//
-//#import ".\\lib\\EXCEL.EXE" \
-//	rename("DialogBox", "ExcelDialogBox") \
-//	rename("RGB", "ExcelRGB") \
-//	rename("CopyFile", "ExcelCopyFile") \
-//	rename("ReplaceText", "ExcelReplaceText") \
-//	no_auto_exclude
-//
-//#pragma endregion
 
 
 

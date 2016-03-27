@@ -9,10 +9,9 @@ public:
     PptConverter();
     virtual ~PptConverter();
 
-    // convert office file to picture with |width| and |height|
+    // convert office file to picture
     virtual bool Convert(const std::wstring& file_path,
-                         const std::wstring& output_path,
-                         int width, int height) override;
+                         const std::wstring& output_path) override;
 };
 
 

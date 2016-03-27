@@ -44,15 +44,8 @@ OfficeConverter::~OfficeConverter()
 
 }
 
-bool OfficeConverter::Save(const std::wstring& output_file_path,
-                           int width, int height)
+bool OfficeConverter::Save(const std::wstring& output_file_path)
 {
-    // Initialize GDI+.
-    GdiplusStartupInput gdiplusStartupInput;
-    ULONG_PTR gdiplusToken;
-    GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
-
-    bool result = false;
     do 
     {
         if (!::OpenClipboard(NULL)) // 打开剪贴板
@@ -61,7 +54,6 @@ bool OfficeConverter::Save(const std::wstring& output_file_path,
             break;
         }
 
-        //////////////////////////////////////////////////////////////////////////
         HENHMETAFILE hEnhMetaFile = (HENHMETAFILE)GetClipboardData(CF_ENHMETAFILE); // 获取剪贴板数据句柄 
         if (hEnhMetaFile == NULL)
         {
@@ -69,62 +61,25 @@ bool OfficeConverter::Save(const std::wstring& output_file_path,
             assert(false && L"操作剪贴板时出现错误");
             break;
         }
+        // Initialize GDI+.
+        GdiplusStartupInput gdiplusStartupInput;
+        ULONG_PTR gdiplusToken;
+        GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 
         Gdiplus::Metafile metaFile(hEnhMetaFile);
-        int result_widht = width;
-        int result_height = height;
-        if (width > 0)
-        {
-            float scale = (static_cast<float>(width))/ metaFile.GetWidth();
-            result_height = static_cast<int>(scale * metaFile.GetHeight());
-        }
-        else if (height > 0)
-        {
-            float scale = (static_cast<float>(height)) / metaFile.GetHeight();
-            result_widht = static_cast<int>(scale * metaFile.GetWidth());
-        }
-        else
-        {
-            result_widht = metaFile.GetWidth();
-            result_height = metaFile.GetHeight();
-        }
-
-        Gdiplus::Bitmap bitmap(result_widht, result_height, PixelFormat24bppRGB);
-        Gdiplus::Graphics graphics(&bitmap);
-        graphics.Clear(Gdiplus::Color(255, 255, 255));
-        Gdiplus::Rect rect(0,0,result_widht, result_height);
-        ImageAttributes imAtt;
-        imAtt.SetWrapMode(WrapModeTileFlipXY);
-        graphics.SetInterpolationMode(InterpolationModeHighQuality);
-        graphics.SetPixelOffsetMode(PixelOffsetModeHighQuality);
-        graphics.DrawImage(&metaFile, rect, 
-                           0, 0, metaFile.GetWidth(), metaFile.GetHeight(), 
-                           Gdiplus::UnitPixel, &imAtt);
-
         CLSID encoderClsid;
         Status stat;
 
         // Get the CLSID of the PNG encoder.
-        if (-1 == GetEncoderClsid(L"image/png", &encoderClsid))
-        {
-            assert(false && L"获取CLSID失败");
-            break;
-        }
-
-        //Gdiplus::EncoderParameters parameters;
-        //parameters.Count = 1;
-        //parameters.Parameter[0].Guid = Gdiplus::EncoderQuality;
-        //parameters.Parameter[0].Type = Gdiplus::EncoderParameterValueTypeLong;
-        //parameters.Parameter[0].NumberOfValues = 1;
-        //int quality = 100;
-        //parameters.Parameter[0].Value = &quality;
-        //stat = metaFile.Save(output_file_path.c_str(), &encoderClsid, &parameters);
-        stat = bitmap.Save(output_file_path.c_str(), &encoderClsid, NULL);
+        GetEncoderClsid(L"image/png", &encoderClsid);
+        stat = metaFile.Save(output_file_path.c_str(), &encoderClsid, NULL);
         if (stat != Ok)
         {
             assert(false && L"保存文件夹时出现错误");
         }
         DeleteEnhMetaFile(hEnhMetaFile);
+
+        GdiplusShutdown(gdiplusToken);
 
         //////////////////////////////////////////////////////////////////////////
         /*  example of saving as metafile
@@ -150,12 +105,12 @@ bool OfficeConverter::Save(const std::wstring& output_file_path,
         */
         //////////////////////////////////////////////////////////////////////////
 
-        result = true;
+        EmptyClipboard();
+        CloseClipboard();
+        return true;
     } while (false);
-
-    GdiplusShutdown(gdiplusToken);
 
     EmptyClipboard();
     CloseClipboard();
-    return result;
+    return false;
 }
