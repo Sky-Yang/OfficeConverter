@@ -6,12 +6,16 @@
 class PptConverter: public OfficeConverter
 {
 public:
-    PptConverter();
+    PptConverter(int width, int height);
     virtual ~PptConverter();
 
     // convert office file to picture
     virtual bool Convert(const std::wstring& file_path,
                          const std::wstring& output_path) override;
+
+private:
+    int width_;
+    int height_;
 };
 
 

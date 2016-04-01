@@ -74,7 +74,7 @@ bool ExcelConverter::Convert(const std::wstring& file_path,
         used_range.CopyPicture(1, 1);
 
         std::wostringstream out_stream;
-        out_stream << output_path.c_str() << L"_word_" << i << L".png";
+        out_stream << output_path.c_str() << L"_excel_" << i << L".png";
         bool result = Save(out_stream.str());
         if (!result)
         {

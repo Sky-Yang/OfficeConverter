@@ -6,7 +6,9 @@
 
 using namespace ppt;
 
-PptConverter::PptConverter()
+PptConverter::PptConverter(int width, int height)
+    : width_(width)
+    , height_(height)
 {
 
 }
@@ -17,7 +19,7 @@ PptConverter::~PptConverter()
 }
 
 bool PptConverter::Convert(const std::wstring& file_path,
-                            const std::wstring& output_path)
+                           const std::wstring& output_path)
 {
     CApplication ppt_app;
     CPresentations presentations;
@@ -51,7 +53,7 @@ bool PptConverter::Convert(const std::wstring& file_path,
     presentations.AttachDispatch(ppt_app.get_Presentations());
     presentations.Open(file_path.c_str(), TRUE, 1, 1);
     presentation.AttachDispatch(ppt_app.get_ActivePresentation(), TRUE);    
-    presentation.Export(output_path.c_str(), L"png", ppt_app.get_Width(), ppt_app.get_Height());
+    presentation.Export(output_path.c_str(), L"png", width_, height_);
 
     //////////////////////////////////////////////////////////////////////////
     /* another way to convert to image files */

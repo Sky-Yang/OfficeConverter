@@ -46,6 +46,12 @@ OfficeConverter::~OfficeConverter()
 
 bool OfficeConverter::Save(const std::wstring& output_file_path)
 {
+    // Initialize GDI+.
+    GdiplusStartupInput gdiplusStartupInput;
+    ULONG_PTR gdiplusToken;
+    GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+
+    bool result = false;
     do 
     {
         if (!::OpenClipboard(NULL)) // 打开剪贴板
@@ -61,10 +67,6 @@ bool OfficeConverter::Save(const std::wstring& output_file_path)
             assert(false && L"操作剪贴板时出现错误");
             break;
         }
-        // Initialize GDI+.
-        GdiplusStartupInput gdiplusStartupInput;
-        ULONG_PTR gdiplusToken;
-        GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 
         Gdiplus::Metafile metaFile(hEnhMetaFile);
         CLSID encoderClsid;
@@ -78,8 +80,6 @@ bool OfficeConverter::Save(const std::wstring& output_file_path)
             assert(false && L"保存文件夹时出现错误");
         }
         DeleteEnhMetaFile(hEnhMetaFile);
-
-        GdiplusShutdown(gdiplusToken);
 
         //////////////////////////////////////////////////////////////////////////
         /*  example of saving as metafile
@@ -105,12 +105,12 @@ bool OfficeConverter::Save(const std::wstring& output_file_path)
         */
         //////////////////////////////////////////////////////////////////////////
 
-        EmptyClipboard();
-        CloseClipboard();
-        return true;
+        result = true;
     } while (false);
+
+    GdiplusShutdown(gdiplusToken);
 
     EmptyClipboard();
     CloseClipboard();
-    return false;
+    return result;
 }

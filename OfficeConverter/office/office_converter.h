@@ -1,6 +1,7 @@
 // office_converter.h : office file converter
 #pragma once
 
+#include <cassert>
 #include <string>
 
 class OfficeConverter

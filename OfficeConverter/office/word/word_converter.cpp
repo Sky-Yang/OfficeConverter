@@ -87,7 +87,7 @@ bool WordConverter::Convert(const std::wstring& file_path,
     long start = 0;
     long end = 0;
 
-    long page_count = doc.ComputeStatistics(2, &covOptional);   //Ò³Êý
+    long page_count = rng.ComputeStatistics(2);   //Ò³Êý
     selection.SetRange(start, end);
 
     int count = page_count;
