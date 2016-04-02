@@ -47,7 +47,6 @@ bool PptConverter::Convert(const std::wstring& file_path,
         return false;
     }
     CString version = ppt_app.get_Version();
-    AfxMessageBox(version);
     int ver = 15;
     try
     {
@@ -56,6 +55,7 @@ bool PptConverter::Convert(const std::wstring& file_path,
     }
     catch (...)
     {
+        assert(false && L"转换版本号失败，用最新接口执行");
     }
     try
     {

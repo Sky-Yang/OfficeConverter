@@ -47,7 +47,6 @@ bool ExcelConverter::Convert(const std::wstring& file_path,
     }
 
     CString version = app.get_Version();
-    AfxMessageBox(version);
     int ver = 15;
     try
     {
@@ -56,6 +55,7 @@ bool ExcelConverter::Convert(const std::wstring& file_path,
     }
     catch (...)
     {
+        assert(false && L"转换版本号失败，用最新接口执行");
     }
     app.put_UserControl(TRUE);
 
