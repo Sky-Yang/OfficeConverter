@@ -37,7 +37,7 @@ bool PptConverter::Convert(const std::wstring& file_path,
         }
         if (!ppt_app.CreateDispatch(_T("PowerPoint.Application"), NULL))
         {
-            AfxMessageBox(L"无法启动PowerPoint程序!");
+            AfxMessageBox(L"无法启动PowerPoint程序!请先安装Office PowerPoint!");
             CoUninitialize();
             return false;
         }
@@ -46,44 +46,83 @@ bool PptConverter::Convert(const std::wstring& file_path,
     {
         return false;
     }
-
-    ppt_app.m_bAutoRelease = true;
-    ppt_app.put_Visible(long(1));
-    ppt_app.put_WindowState(long(2));
-    presentations.AttachDispatch(ppt_app.get_Presentations());
-    presentations.Open(file_path.c_str(), TRUE, 1, 1);
-    presentation.AttachDispatch(ppt_app.get_ActivePresentation(), TRUE);    
-    presentation.Export(output_path.c_str(), L"png", width_, height_);
+    CString version = ppt_app.get_Version();
+    AfxMessageBox(version);
+    int ver = 15;
+    try
+    {
+        ver = _wtoi(version.GetBuffer());
+        version.ReleaseBuffer();
+    }
+    catch (...)
+    {
+    }
+    try
+    {
+        LPDISPATCH lpDisp;
+        ppt_app.m_bAutoRelease = true;
+        presentations.AttachDispatch(ppt_app.get_Presentations());
+        switch (ver)
+        {
+        case OFFICE_97:
+        case OFFICE_2000:
+        case OFFICE_2002:
+        case OFFICE_2003:
+            lpDisp = presentations.OpenOld(file_path.c_str(), 1, 0, 0);
+            break;
+        case OFFICE_2007:
+            lpDisp = presentations.Open2007(file_path.c_str(), 1, 0, 0, 0);
+        case OFFICE_2010:
+        case OFFICE_2013:
+        default:
+            lpDisp = presentations.Open(file_path.c_str(), 1, 0, 0);
+            break;
+        }
+        presentation.AttachDispatch(lpDisp, TRUE);
+        // export ppt to images
+        presentation.Export(output_path.c_str(), L"png", width_, height_);
+    }
+    catch (...)
+    {
+        assert(false && L"操作ppt时出现错误");
+        presentation.Close();
+        ppt_app.Quit();
+        presentation.ReleaseDispatch();
+        presentations.ReleaseDispatch();
+        ppt_app.ReleaseDispatch();
+        CoUninitialize();
+        return false;
+    }
 
     //////////////////////////////////////////////////////////////////////////
     /* another way to convert to image files */
-    /*
-    slides = presentation.get_Slides();
-    int pageCount = slides.get_Count();
-    for (int i = 1; i <= pageCount; i++)
-    {
-        slide = slides.Range(COleVariant((long)i));
-        slide.Copy();
-        std::wostringstream out_stream;
-        out_stream << output_path.c_str() << L"_ppt_" << i << L".png";
-        bool result = Save(out_stream.str());
-        if (!result)
-        {
-            int err = GetLastError();
-            slide.ReleaseDispatch();
-            slides.ReleaseDispatch();
-            presentation.Close();
-            presentation.ReleaseDispatch();
-            presentations.ReleaseDispatch();
-            ppt_app.Quit();
-            ppt_app.ReleaseDispatch();
-            CoUninitialize();
-            return false;
-        }
-    }
-    slide.ReleaseDispatch();
-    slides.ReleaseDispatch();
-    */
+// 
+//     slides = presentation.get_Slides();
+//     int pageCount = slides.get_Count();
+//     for (int i = 1; i <= pageCount; i++)
+//     {
+//         slide = slides.Range(COleVariant((long)i));
+//         slide.Copy();
+//         std::wostringstream out_stream;
+//         out_stream << output_path.c_str() << L"_ppt_" << i << L".png";
+//         bool result = Save(out_stream.str());
+//         if (!result)
+//         {
+//             int err = GetLastError();
+//             slide.ReleaseDispatch();
+//             slides.ReleaseDispatch();
+//             presentation.Close();
+//             presentation.ReleaseDispatch();
+//             presentations.ReleaseDispatch();
+//             ppt_app.Quit();
+//             ppt_app.ReleaseDispatch();
+//             CoUninitialize();
+//             return false;
+//         }
+//     }
+//     slide.ReleaseDispatch();
+//     slides.ReleaseDispatch();
+
     //////////////////////////////////////////////////////////////////////////
     presentation.Close();
     ppt_app.Quit();

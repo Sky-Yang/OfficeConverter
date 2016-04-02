@@ -146,7 +146,7 @@ void COfficeConverterDlg::OnBnClickedButton1()
     }
     else if (szFileExt == L"ppt" || szFileExt == L"pptx")
     {
-        converter.reset(new PptConverter(1024, 768));
+        converter.reset(new PptConverter(1280, 720));
     }
     else
     {

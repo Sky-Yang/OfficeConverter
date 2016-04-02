@@ -41,11 +41,22 @@ bool ExcelConverter::Convert(const std::wstring& file_path,
 
     if (!app.CreateDispatch(_T("Excel.Application")))
     {
-        AfxMessageBox(_T("无法启动Excel程序!"));
+        AfxMessageBox(_T("无法启动Excel程序!请先安装Office Excel!"));
         CoUninitialize();
         return false;
     }
 
+    CString version = app.get_Version();
+    AfxMessageBox(version);
+    int ver = 15;
+    try
+    {
+        ver = _wtoi(version.GetBuffer());
+        version.ReleaseBuffer();
+    }
+    catch (...)
+    {
+    }
     app.put_UserControl(TRUE);
 
     books.AttachDispatch(app.get_Workbooks());
