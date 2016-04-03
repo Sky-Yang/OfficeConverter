@@ -11,7 +11,8 @@ public:
 
     // convert office file to picture
     virtual bool Convert(const std::wstring& file_path,
-                         const std::wstring& output_path) = 0;
+                         const std::wstring& output_path,
+                         int width, int height) = 0;
 
 protected:
     enum VERSION
@@ -25,5 +26,5 @@ protected:
         OFFICE_2013 = 15,
     };
 
-    bool Save(const std::wstring& output_file_path);
+    bool Save(const std::wstring& output_file_path, int width, int height);
 };

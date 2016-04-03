@@ -1,14 +1,10 @@
 #include "StdAfx.h"
 #include "office/ppt/ppt_converter.h"
-
-#include <sstream>
 #include "office/ppt/ppt_interfaces.h"
 
 using namespace ppt;
 
-PptConverter::PptConverter(int width, int height)
-    : width_(width)
-    , height_(height)
+PptConverter::PptConverter()
 {
 
 }
@@ -19,13 +15,14 @@ PptConverter::~PptConverter()
 }
 
 bool PptConverter::Convert(const std::wstring& file_path,
-                           const std::wstring& output_path)
+                           const std::wstring& output_path,
+                           int width, int height)
 {
     CApplication ppt_app;
     CPresentations presentations;
     CPresentation presentation;
-    //CSlide slide;
-    //CSlides slides;
+    CSlide slide;
+    CSlides slides;
 
     try
     {
@@ -79,8 +76,41 @@ bool PptConverter::Convert(const std::wstring& file_path,
             break;
         }
         presentation.AttachDispatch(lpDisp, TRUE);
-        // export ppt to images
-        presentation.Export(output_path.c_str(), L"png", width_, height_);
+
+        //////////////////////////////////////////////////////////////////////////
+        // the first way to exporting ppt to images
+        //presentation.Export(output_path.c_str(), L"png", width, height);
+        //////////////////////////////////////////////////////////////////////////
+        /* another way to convert to image files */         
+        slides = presentation.get_Slides();
+        int pageCount = slides.get_Count();
+        for (int i = 1; i <= pageCount; i++)
+        {
+            slide = slides.Range(COleVariant((long)i));
+            slide.Copy();
+            std::wstring filename;
+            filename.resize(256);
+            bool result = false;
+            if (0 < swprintf_s(&filename.front(), 256, L"%s%s%04d%s", output_path.c_str(), L"_ppt_", i, L".png"))
+                result = Save(filename, width, height);
+
+            if (!result)
+            {
+                int err = GetLastError();
+                slide.ReleaseDispatch();
+                slides.ReleaseDispatch();
+                presentation.Close();
+                presentation.ReleaseDispatch();
+                presentations.ReleaseDispatch();
+                ppt_app.Quit();
+                ppt_app.ReleaseDispatch();
+                CoUninitialize();
+                return false;
+            }
+        }
+        slide.ReleaseDispatch();
+        slides.ReleaseDispatch();
+        //////////////////////////////////////////////////////////////////////////
     }
     catch (...)
     {
@@ -93,37 +123,6 @@ bool PptConverter::Convert(const std::wstring& file_path,
         CoUninitialize();
         return false;
     }
-
-    //////////////////////////////////////////////////////////////////////////
-    /* another way to convert to image files */
-// 
-//     slides = presentation.get_Slides();
-//     int pageCount = slides.get_Count();
-//     for (int i = 1; i <= pageCount; i++)
-//     {
-//         slide = slides.Range(COleVariant((long)i));
-//         slide.Copy();
-//         std::wostringstream out_stream;
-//         out_stream << output_path.c_str() << L"_ppt_" << i << L".png";
-//         bool result = Save(out_stream.str());
-//         if (!result)
-//         {
-//             int err = GetLastError();
-//             slide.ReleaseDispatch();
-//             slides.ReleaseDispatch();
-//             presentation.Close();
-//             presentation.ReleaseDispatch();
-//             presentations.ReleaseDispatch();
-//             ppt_app.Quit();
-//             ppt_app.ReleaseDispatch();
-//             CoUninitialize();
-//             return false;
-//         }
-//     }
-//     slide.ReleaseDispatch();
-//     slides.ReleaseDispatch();
-
-    //////////////////////////////////////////////////////////////////////////
     presentation.Close();
     ppt_app.Quit();
     presentation.ReleaseDispatch();

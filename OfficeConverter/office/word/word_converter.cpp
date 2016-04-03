@@ -1,7 +1,5 @@
 #include "StdAfx.h"
 #include "office/word/word_converter.h"
-
-#include <sstream>
 #include "office/word/word_interfaces.h"
 
 using namespace word;
@@ -17,7 +15,8 @@ WordConverter::~WordConverter()
 }
 
 bool WordConverter::Convert(const std::wstring& file_path, 
-                            const std::wstring& output_path)
+                            const std::wstring& output_path,
+                            int width, int height)
 {
     CApplication WordApp;   // WORD³ÌÐò
     WordApp.m_bAutoRelease = true;
@@ -160,9 +159,12 @@ bool WordConverter::Convert(const std::wstring& file_path,
             return false;
         }
 
-        std::wostringstream out_stream;
-        out_stream << output_path.c_str() << L"_word_" << num << L".png";
-        bool result = Save(out_stream.str());
+        std::wstring filename;
+        filename.resize(256);
+        bool result = false;
+        if (0 < swprintf_s(&filename.front(), 256, L"%s%s%04d%s", output_path.c_str(), L"_word_", num, L".png"))
+            result = Save(filename, width, height);
+
         if (!result)
         {
             rng.ReleaseDispatch();
