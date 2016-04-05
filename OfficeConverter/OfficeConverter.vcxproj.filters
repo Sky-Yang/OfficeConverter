@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="office">
+      <UniqueIdentifier>{ff58cab1-a9c0-4c96-8a95-373b6ed59ce4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="office\word">
+      <UniqueIdentifier>{4db3bb6f-3ee2-4ab5-b6f9-2f6aef609e06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="office\excel">
+      <UniqueIdentifier>{782eb79c-0b2f-4111-8064-3b2ca5f0571b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="office\ppt">
+      <UniqueIdentifier>{76ae1f4b-7551-4478-984f-081ed1c6154b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="OfficeConverter.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="OfficeConverterDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="office\office_converter.h">
+      <Filter>office</Filter>
+    </ClInclude>
+    <ClInclude Include="office\word\word_converter.h">
+      <Filter>office\word</Filter>
+    </ClInclude>
+    <ClInclude Include="office\word\word_interfaces.h">
+      <Filter>office\word</Filter>
+    </ClInclude>
+    <ClInclude Include="office\excel\excel_converter.h">
+      <Filter>office\excel</Filter>
+    </ClInclude>
+    <ClInclude Include="office\excel\excel_interfaces.h">
+      <Filter>office\excel</Filter>
+    </ClInclude>
+    <ClInclude Include="office\ppt\ppt_converter.h">
+      <Filter>office\ppt</Filter>
+    </ClInclude>
+    <ClInclude Include="office\ppt\ppt_interfaces.h">
+      <Filter>office\ppt</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="OfficeConverter.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="OfficeConverterDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="office\word\word_converter.cpp">
+      <Filter>office\word</Filter>
+    </ClCompile>
+    <ClCompile Include="office\office_converter.cpp">
+      <Filter>office</Filter>
+    </ClCompile>
+    <ClCompile Include="office\excel\excel_converter.cpp">
+      <Filter>office\excel</Filter>
+    </ClCompile>
+    <ClCompile Include="office\ppt\ppt_converter.cpp">
+      <Filter>office\ppt</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="OfficeConverter.rc">
+      <Filter>资源文件</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\OfficeConverter.rc2">
+      <Filter>资源文件</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\OfficeConverter.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+  </ItemGroup>
+</Project>
