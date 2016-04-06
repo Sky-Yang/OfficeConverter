@@ -163,7 +163,7 @@ bool WordConverter::Convert(const std::wstring& file_path,
         filename.resize(256);
         bool result = false;
         if (0 < swprintf_s(&filename.front(), 256, L"%s%s%04d%s", output_path.c_str(), L"_word_", num, L".png"))
-            result = Save(filename, width, height);
+            result = Save(filename, width, height, FIT_AUTO);
 
         if (!result)
         {

@@ -26,5 +26,13 @@ protected:
         OFFICE_2013 = 15,
     };
 
-    bool Save(const std::wstring& output_file_path, int width, int height);
+    enum SCALE
+    {
+        FIT_BY_WIDTH  = 0,
+        FIT_BY_HEIGHT = 1,
+        FIT_AUTO = 2,
+    };
+
+    bool Save(const std::wstring& output_file_path, int width, int height,
+              SCALE type);
 };

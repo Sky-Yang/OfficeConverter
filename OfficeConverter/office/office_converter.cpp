@@ -45,7 +45,7 @@ OfficeConverter::~OfficeConverter()
 }
 
 bool OfficeConverter::Save(const std::wstring& output_file_path,
-                           int width, int height)
+                           int width, int height, SCALE type)
 {
     // Initialize GDI+.
     GdiplusStartupInput gdiplusStartupInput;
@@ -71,34 +71,52 @@ bool OfficeConverter::Save(const std::wstring& output_file_path,
         }
 
         Gdiplus::Metafile metaFile(hEnhMetaFile);
-        int result_widht = width;
+        int result_width = width;
         int result_height = height;
-        if (width > 0)
+        switch (type)
         {
-            float scale = (static_cast<float>(width))/ metaFile.GetWidth();
+        case FIT_BY_WIDTH:
+        {
+            float scale = (static_cast<float>(width)) / metaFile.GetWidth();
             result_height = static_cast<int>(scale * metaFile.GetHeight());
+            break;
         }
-        else if (height > 0)
+        case FIT_BY_HEIGHT:
         {
             float scale = (static_cast<float>(height)) / metaFile.GetHeight();
-            result_widht = static_cast<int>(scale * metaFile.GetWidth());
+            result_width = static_cast<int>(scale * metaFile.GetHeight());
+            break;
         }
-        else
+        case FIT_AUTO:
         {
-            result_widht = metaFile.GetWidth();
-            result_height = metaFile.GetHeight();
+            float scale = (static_cast<float>(width)) / height;
+            float scale_pic = (static_cast<float>(metaFile.GetWidth())) / metaFile.GetHeight();
+            if (scale > scale_pic)
+            {
+                result_height = height;
+                result_width = height * metaFile.GetWidth() / metaFile.GetHeight();
+            }
+            else
+            {
+                result_width = width;
+                result_height = width * metaFile.GetHeight() / metaFile.GetWidth();
+            }
+            break;
+        }
+        default:
+            break;
         }
 
-        Gdiplus::Bitmap bitmap(result_widht, result_height, PixelFormat24bppRGB);
+        Gdiplus::Bitmap bitmap(width, height, PixelFormat24bppRGB);
         Gdiplus::Graphics graphics(&bitmap);
         graphics.Clear(Gdiplus::Color(255, 255, 255));
-        Gdiplus::Rect rect(0,0,result_widht, result_height);
+        Gdiplus::Rect rect(0, 0, result_width, result_height);
         ImageAttributes imAtt;
         imAtt.SetWrapMode(WrapModeTileFlipXY);
         graphics.SetInterpolationMode(InterpolationModeHighQuality);
         graphics.SetPixelOffsetMode(PixelOffsetModeHighQuality);
         graphics.DrawImage(&metaFile, rect, 
-                           0, 0, metaFile.GetWidth(), metaFile.GetHeight(), 
+                           0, 0, metaFile.GetWidth(), metaFile.GetHeight(),
                            Gdiplus::UnitPixel, &imAtt);
 
         CLSID encoderClsid;
