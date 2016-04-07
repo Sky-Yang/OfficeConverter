@@ -73,6 +73,8 @@ bool OfficeConverter::Save(const std::wstring& output_file_path,
         Gdiplus::Metafile metaFile(hEnhMetaFile);
         int result_width = width;
         int result_height = height;
+        int pic_width = width;
+        int pic_height = height;
         switch (type)
         {
         case FIT_BY_WIDTH:
@@ -95,11 +97,13 @@ bool OfficeConverter::Save(const std::wstring& output_file_path,
             {
                 result_height = height;
                 result_width = height * metaFile.GetWidth() / metaFile.GetHeight();
+                pic_width = result_width;
             }
             else
             {
                 result_width = width;
                 result_height = width * metaFile.GetHeight() / metaFile.GetWidth();
+                pic_height = result_height;
             }
             break;
         }
@@ -107,7 +111,7 @@ bool OfficeConverter::Save(const std::wstring& output_file_path,
             break;
         }
 
-        Gdiplus::Bitmap bitmap(width, height, PixelFormat24bppRGB);
+        Gdiplus::Bitmap bitmap(pic_width, pic_height, PixelFormat24bppRGB);
         Gdiplus::Graphics graphics(&bitmap);
         graphics.Clear(Gdiplus::Color(255, 255, 255));
         Gdiplus::Rect rect(0, 0, result_width, result_height);
